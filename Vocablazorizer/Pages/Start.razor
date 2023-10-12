@@ -1,0 +1,46 @@
+﻿@using Vocablazorizer.Data;
+@using Vocablazorizer.Services;
+
+@inject VocabularyService vocabulayService;
+@inject NavigationManager navigationManager
+
+<button @onclick="@(() => navigationManager.NavigateTo("/"))">Quit</button>
+
+<InputText @onclick="CheckAnswer" Placeholder="Translation for this word">
+
+</InputText>
+
+@code {
+
+    Vocabulary CurrenctVocabulary { get; set; }
+    List<Vocabulary> Vocabularies { get; set; } 
+
+    public void StartVocabularyQuestioning()
+    {
+        for(int x = 0; x < Vocabularies.Count; x++)
+        {
+            Vocabularies[x].Id = x;
+        }
+    }
+
+
+    protected async Task OnInitializedAsync()
+    {
+        Vocabularies = vocabulayService.GetVocabularies();
+    }
+
+    private void CheckAnswer()
+    {
+        if(CurrenctVocabulary.WordTranslated == CurrenctVocabulary.Word)
+        {
+            Random rnd = new Random();
+            int randomNextVocabulary = rnd.Next(Vocabularies.Count);
+            CurrenctVocabulary = Vocabularies[randomNextVocabulary];
+        }
+    }
+
+
+}
+
+
+

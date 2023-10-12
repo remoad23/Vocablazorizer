@@ -1,0 +1,6 @@
+﻿@page "/"
+
+@inject NavigationManager navigationManager
+
+<button @onclick="@( () => navigationManager.NavigateTo("/Start") )">Start</button>
+<button @onclick="@( () => navigationManager.NavigateTo("/Edit") )">Edit Vocabluary</button>

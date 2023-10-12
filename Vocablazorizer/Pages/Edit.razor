@@ -1,0 +1,67 @@
+﻿@using Vocablazorizer.Data;
+@using Vocablazorizer.Services;
+
+@inject NavigationManager navigationManager
+@inject VocabularyService vocabulayService;
+
+<h3>Edit</h3>
+<button @onclick="@(() => navigationManager.NavigateTo("/"))">Back</button>
+
+<InputText @onchange="(args) => SearchForVocabulary(args.Value.ToString())" Placeholder="Search for vocabulary"></InputText>
+
+<div class="row">
+        <InputText Placeholder="Word"></InputText>
+        <InputText Placeholder="Word To Translate">Word to Translate</InputText>
+        <button @onclick="AddVocabulary()">Save</button>
+</div>
+
+@foreach (Vocabulary voc in VocabulariesToDiplay)
+{
+    <div class="row">
+        <InputText bind="@voc.Word">@voc.Word</InputText>
+        <InputText bind="@voc.WordTranslated">@voc.WordTranslated</InputText>
+        <button>Remove</button>
+    </div>
+}
+
+@code {
+    Vocabulary CurrenctVocabulary { get; set; }
+    List<Vocabulary> Vocabularies { get; set; }
+    List<Vocabulary> VocabulariesToDiplay { get; set; }
+
+    protected async Task OnInitializedAsync()
+    {
+        Vocabularies = vocabulayService.GetVocabularies();
+        VocabulariesToDiplay = Vocabularies;
+    }
+
+
+    private void AddVocabulary(string word, string wordToTranslate)
+    {
+        var vocToAdd = new Vocabulary
+            {
+                Id = Vocabularies.Max(voc => voc.Id) + 1,
+                Word = word,
+                WordTranslated = wordToTranslate
+            };
+
+        Vocabularies.Add(vocToAdd);
+        VocabulariesToDiplay.Add(vocToAdd);
+        vocabulayService.AddNewVocabularies(vocToAdd);
+    }
+
+    private void DeleteVocabulary(Vocabulary vocToDelete)
+    {
+        Vocabularies.Remove(vocToDelete);
+        VocabulariesToDiplay.Remove(vocToDelete);
+        vocabulayService.DeleteVocabulary(vocToDelete);
+    }
+
+    private void SearchForVocabulary(string wordToLookFor)
+    {
+        if (String.IsNullOrEmpty(wordToLookFor))
+            VocabulariesToDiplay = Vocabularies;
+        else
+            VocabulariesToDiplay = Vocabularies.Where(voc => voc.Word.Contains(wordToLookFor) || voc.WordTranslated.Contains(wordToLookFor)).ToList();
+    }
+}
